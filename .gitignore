@@ -1,0 +1,37 @@
+# Files to be ignored
+
+# General file
+*test*
+*.swp
+*.tmp*
+*.bak*
+
+# Vivado output
+*.log
+*.jou
+
+# ctags and cscope
+tags
+cscope.files
+cscope.out
+
+# Binaries
+*.o
+*.elf
+*.ar
+*.a
+*.bin
+
+# Kernel
+*.ko
+*.cmd*
+*.mod*
+*.symvers
+*.order
+
+# HDL Simulator
+*.vcd
+*.gtkw
+
+# Directories
+*/build

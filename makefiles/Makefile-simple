@@ -1,0 +1,69 @@
+#-------------------------------------------------------------------------------
+#
+#  file           Makefile-simple
+#  date           2019/07/21
+#
+#  author         Alexander Zoellner
+#  contact        zoellner.contact<at>gmail.com
+#
+#  brief          Makefile template for building Linux user space software.
+#
+#                 Uses out of source compilation, i.e. files are built in a
+#                 different directory then the source files.
+#-------------------------------------------------------------------------------
+
+# Name of the executable (change as required)
+TARGET := <my_appl>
+
+# Compiler to use (change as required, e.g. g++)
+CC := gcc
+# Add compiler flags and keep the ones already set (mostly for warning flags
+# and include directories with '-I<path>')
+CFLAGS += -Wall -g -I.
+# Add linker flags
+LDFLAGS +=
+# Set libraries for the linker with -l (e.g. pthread with '-lpthread')
+LDLIBS +=
+
+
+# Directory containing source files (*.c, *.cpp, etc.)
+SRC_DIR := .
+# Directory for header files (*.h, *.hpp, etc.)
+HEADER_DIR := .
+# Directory to place the object files in)
+BUILD_DIR := build
+
+# Add all source files found in the source directory (change file ending as
+# required). You may also list them explicitly if you want to.
+SRCS := $(wildcard $(SRC_DIR)/*.c)
+# Add object file for each source file
+OBJS := $(SRCS:$(SRC_DIR)/%.c=$(BUILD_DIR)/%.o)
+
+
+# Makefile targets
+.PHONY: all clean
+# Default target
+.DEFAULT: all
+
+all: $(OBJ_DIR) $(TARGET)
+
+# Link object files to executable
+$(TARGET): $(OBJS)
+	@echo '    ' LD '    ' $@
+	@$(CC) $(LDFLAGS)-o $(TARGET) $^ $(LDLIBS)
+
+# Compile source files to object files
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
+	@echo '    ' CC '    ' $@
+	@$(CC) $(CFLAGS) -c -o $@ $<
+
+# Create build directory if it does not exist
+$(OBJ_DIR):
+	@mkdir -p $(OBJ_DIR)
+
+# Remove all generated files
+clean:
+	rm -rf $(BUILD_DIR)/$(TARGET)
+	rm -rf $(BUILD_DIR)/*.o
+	rm -rf $(BUILD_DIR)/*.a
+	rm -rf $(BUILD_DIR)/*.so

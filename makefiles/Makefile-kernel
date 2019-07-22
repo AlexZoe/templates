@@ -1,0 +1,66 @@
+#-------------------------------------------------------------------------------
+#
+#  file           Makefile-kernel
+#  date           2019/07/21
+#
+#  author         Alexander Zoellner
+#  contact        zoellner.contact<at>gmail.com
+#
+#  brief          Makefile template for building Linux device driver modules.
+#
+#                 Compile module for the architecture this Makefile is executed
+#                 or for a different device by using the Xilinx cross-compile
+#                 environment. Requires a Vivado installation and the Xilinx
+#                 version of the Linux Kernel repository.
+#                 Download with 'git clone git@github.com:Xilinx/linux-xlnx.git'
+#-------------------------------------------------------------------------------
+
+# Name of the main file of the device module without file ending
+PROJECT := <main-file>
+
+ifneq ($(KERNELRELEASE),)
+
+# The main object file derived from project name
+obj-m := $(PROJECT).o
+# Add further object files here if the module uses more than one source file
+objs :=
+
+else
+
+# Cross-compile if Vivado environment has been set (the source script is usually
+# located in the installation directory)
+ifdef XILINX_VIVADO_DIR_
+# Cross-compile for ARM (set different architecture as required)
+export ARCH=arm
+# Set cross-compile prefix
+export CROSS_COMPILE=arm-linux-gnueabihf-
+# Set cross-compiler
+CC   := $(CROSS_COMPILE)gcc
+# Path to Xilinx's Linux kernel repo for kernel headers (change as required)
+KDIR := my/path/to/linux-xlnx/
+else
+# Use system kernel modules when not compiling natively
+KDIR ?= /lib/modules/$(shell uname -r)/build
+endif
+
+# Targets
+.PHONY := default clean
+
+# Call kernel Makefile and use 'Sparse' (e.g. checks if hardware addresses are
+# dereferenced directly). Remove C=1 if you do not want to use it.
+default:
+	$(MAKE) -C $(KDIR) M=$$PWD C=1
+
+# Remove all generated files
+clean:
+	rm -rf *.order
+	rm -rf *.symvers
+	rm -rf *.o
+	rm -rf *.ko
+	rm -rf *.mod.*
+	rm -rf .$(PROJECT)*
+	rm -rf .tmp*
+	rm -rf .built-in*
+
+endif
+
