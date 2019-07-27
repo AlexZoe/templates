@@ -45,7 +45,7 @@ OBJS := $(SRCS:$(SRC_DIR)/%.c=$(BUILD_DIR)/%.o)
 # Default target
 .DEFAULT: all
 
-all: $(OBJ_DIR) $(TARGET)
+all: $(BUILD_DIR) $(TARGET)
 
 # Link object files to executable
 $(TARGET): $(OBJS)
@@ -53,13 +53,13 @@ $(TARGET): $(OBJS)
 	@$(CC) $(LDFLAGS)-o $(TARGET) $^ $(LDLIBS)
 
 # Compile source files to object files
-$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
+$(BUILD_DIR)/%.o: $(SRC_DIR)/%.c
 	@echo '    ' CC '    ' $@
 	@$(CC) $(CFLAGS) -c -o $@ $<
 
 # Create build directory if it does not exist
-$(OBJ_DIR):
-	@mkdir -p $(OBJ_DIR)
+$(BUILD_DIR):
+	@mkdir -p $(BUILD_DIR)
 
 # Remove all generated files
 clean:
