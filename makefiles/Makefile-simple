@@ -1,15 +1,15 @@
 #-------------------------------------------------------------------------------
 #
-#  file           Makefile-simple
-#  date           2019/07/21
+#  @author	Alexander Zoellner
+#  @date	2019/07/21
+#  @mail	zoellner.contact<at>gmail.com
+#  @file	Makefile-simple
 #
-#  author         Alexander Zoellner
-#  contact        zoellner.contact<at>gmail.com
+#  @brief	Makefile template for building Linux user space software.
 #
-#  brief          Makefile template for building Linux user space software.
+#		Uses out of source compilation, i.e. files are built in a
+#		different directory then the source files.
 #
-#                 Uses out of source compilation, i.e. files are built in a
-#                 different directory then the source files.
 #-------------------------------------------------------------------------------
 
 # Name of the executable (change as required)

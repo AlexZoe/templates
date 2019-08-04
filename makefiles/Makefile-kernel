@@ -1,18 +1,18 @@
 #-------------------------------------------------------------------------------
 #
-#  file           Makefile-kernel
-#  date           2019/07/21
+#  @author	Alexander Zoellner
+#  @date	2019/07/21
+#  @mail	zoellner.contact<at>gmail.com
+#  @file	Makefile-kernel
 #
-#  author         Alexander Zoellner
-#  contact        zoellner.contact<at>gmail.com
+#  @brief	Makefile template for building Linux device driver modules.
 #
-#  brief          Makefile template for building Linux device driver modules.
+#		Compile module for the architecture this Makefile is executed
+#		or for a different device by using the Xilinx cross-compile
+#		environment. Requires a Vivado installation and the Xilinx
+#		version of the Linux Kernel repository.
+#		Download with 'git clone git@github.com:Xilinx/linux-xlnx.git'
 #
-#                 Compile module for the architecture this Makefile is executed
-#                 or for a different device by using the Xilinx cross-compile
-#                 environment. Requires a Vivado installation and the Xilinx
-#                 version of the Linux Kernel repository.
-#                 Download with 'git clone git@github.com:Xilinx/linux-xlnx.git'
 #-------------------------------------------------------------------------------
 
 # Name of the main file of the device module without file ending

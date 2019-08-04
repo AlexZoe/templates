@@ -1,0 +1,44 @@
+#-------------------------------------------------------------------------------
+#
+#  @author	Alexander Zoellner
+#  @date	2019/07/21
+#  @mail	zoellner.contact<at>gmail.com
+#  @file	Makefile-vivado
+#
+#  brief	Makefile template for building IP core and system (bitstream).
+#
+#-------------------------------------------------------------------------------
+
+# Path to Vivado environment source script (located in the installation folder
+# and usually named settings64.sh)
+# Alternatively, source the environment before using the Makefile
+XLNX_TOOL_CHAIN := /opt/Xilinx-18-3/xilinx-vivado-2018_3-settings.sh
+IP_CORE_DIR := hdl
+SCRIPT_DIR := tcl
+BUILD_DIR := build
+
+.PHONY: system ip_core build_dir
+.DEFAULT: ip_core
+
+# Package IP core
+ip_core:
+	source $(XLNX_TOOL_CHAIN) && \
+	vivado -mode batch -source $(SCRIPT_DIR)/package_ip.tcl
+
+# Build system and generate bitstream
+system: build_dir
+	source $(XLNX_TOOL_CHAIN) && \
+	vivado -mode batch -source $(SCRIPT_DIR)/project.tcl
+
+# Build folder
+build_dir:
+	mkdir -p $(BUILD_DIR)
+
+# Remove Vivado output files
+clean:
+	rm -rf $(BUILD_DIR)
+	rm -rf *.log *.jou
+	rm -rf $(IP_CORE_DIR)/xgui
+	rm -rf $(IP_CORE_DIR)/component.xml
+	rm -rf .Xil
+	rm -rf *.str

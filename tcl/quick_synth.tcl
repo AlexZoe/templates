@@ -1,9 +1,13 @@
-# @author       Alexander Zoellner
-# @date         2019/06/20
-# @mail         zoellner.contact@gmail.com
-# @file         quick_synth.tcl
+#-------------------------------------------------------------------------------
 #
-# @brief        Runs a quick synthesis mainly for checking syntax
+# @author		Alexander Zoellner
+# @date			2019/06/20
+# @mail			zoellner.contact<at>gmail.com
+# @file			quick_synth.tcl
+#
+# @brief		Runs a quick synthesis mainly for checking syntax
+#
+#-------------------------------------------------------------------------------
 
 # Set directory containing files to be compiled
 set SRC_DIR "../hdl"

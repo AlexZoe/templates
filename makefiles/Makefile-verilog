@@ -1,13 +1,12 @@
 #-------------------------------------------------------------------------------
 #
-#  file           Makefile-verilog
-#  date           2019/07/21
+#  @author	Alexander Zoellner
+#  @date	2019/07/21
+#  @mail	zoellner.contact<at>gmail.com
+#  @file	Makefile-verilog
 #
-#  author         Alexander Zoellner
-#  contact        zoellner.contact<at>gmail.com
-#
-#  brief          Makefile template for simulating a verilog-based hardware
-#                 design using icarus verilog and gtkwave.
+#  brief	Makefile template for simulating a verilog-based hardware
+#		design using icarus verilog and gtkwave.
 #
 #-------------------------------------------------------------------------------
 
