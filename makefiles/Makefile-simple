@@ -9,6 +9,10 @@
 #
 #		Uses out of source compilation, i.e. files are built in a
 #		different directory then the source files.
+#               Call with 'make DEBUG=1' for debug flags and code coverage
+#               information.
+#               The output of the code coverage, 'index.html' in the build
+#               directory 'BUILD_DIR/html' can be viewed in a webbrower.
 #
 #-------------------------------------------------------------------------------
 
@@ -17,14 +21,24 @@ TARGET := <my_appl>
 
 # Compiler to use (change as required, e.g. g++)
 CC := gcc
-# Add compiler flags and keep the ones already set (mostly for warning flags
-# and include directories with '-I<path>')
-CFLAGS += -Wall -g -I.
-# Add linker flags
+# Set general compiler flags (add include directories with '-I<path>')
+CFLAGS += -I.
+# Add general linker flags
 LDFLAGS +=
 # Set libraries for the linker with -l (e.g. pthread with '-lpthread')
 LDLIBS +=
+# Code analysis compiler flags
+A_CFLAGS := -fprofile-arcs -ftest-coverage
+# Code analysis linker flags
+A_LDFLAGS := -fprofile-arcs
 
+ifeq ($(DEBUG), 1)
+	LDLIBS += $(A_LDFLAGS)
+	# Add compiler flags and keep the ones already set (mostly for warning flags
+	CFLAGS += -Wall -Wpedantic -g3 -O0 $(A_CFLAGS)
+else
+	CFLAGS += -O2
+endif
 
 # Directory containing source files (*.c, *.cpp, etc.)
 SRC_DIR := .
@@ -41,7 +55,7 @@ OBJS := $(SRCS:$(SRC_DIR)/%.c=$(BUILD_DIR)/%.o)
 
 
 # Makefile targets
-.PHONY: all clean
+.PHONY: all analyze clean
 # Default target
 .DEFAULT: all
 
@@ -61,9 +75,21 @@ $(BUILD_DIR)/%.o: $(SRC_DIR)/%.c
 $(BUILD_DIR):
 	@mkdir -p $(BUILD_DIR)
 
+# Analyze code coverage (has to be compiled with 'DEBUG=1' first and target
+# executed once)
+analyze:
+	@echo '    ' ANALYZE $(TARGET)
+	@gcov -b -u -f -o $(BUILD_DIR) $(SRCS)
+	@lcov --capture --directory . --output-file $(BUILD_DIR)/$(TARGET).info
+	@genhtml $(BUILD_DIR)/$(TARGET).info --output-directory $(BUILD_DIR)/html
+
 # Remove all generated files
 clean:
-	rm -rf $(BUILD_DIR)/$(TARGET)
+	rm -rf $(TARGET)
+	rm -rf $(TARGET)/html
+	rm -rf $(BUILD_DIR)/*.gcda
+	rm -rf $(BUILD_DIR)/*.gcno
+	rm -rf $(BUILD_DIR)/*.info
 	rm -rf $(BUILD_DIR)/*.o
 	rm -rf $(BUILD_DIR)/*.a
 	rm -rf $(BUILD_DIR)/*.so
