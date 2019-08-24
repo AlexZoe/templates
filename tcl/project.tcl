@@ -20,7 +20,7 @@ source tcl/settings.tcl
 # edit the project afterwards
 #create_project ${MODULE} -in_memory -part ${CHIP}
 # Omit -in_memory if you want to keep the project for further editing
-create_project -force ${MODULE} -part ${CHIP} ${MODULE}
+create_project -force ${outputDir}/${MODULE} -part ${CHIP} ${MODULE}
 
 # Set the board pre-sets
 set_property board_part ${BOARD} [current_project]
