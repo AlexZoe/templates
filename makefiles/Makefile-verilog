@@ -36,7 +36,7 @@ TB :=$(wildcard $(TB_DIR)/*_tb.v)
 # Targets
 .PHONY: clean sim build_dir wave
 # Default when calling 'make'
-.DEFAULT: sim
+.DEFAULT_GOAL := sim
 
 # Generate executable
 sim: build_dir

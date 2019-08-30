@@ -30,7 +30,7 @@ ENV_CMD := source $(XLNX_TOOL_CHAIN) &&
 endif
 
 .PHONY: system ip_core build_dir
-.DEFAULT: ip_core
+.DEFAULT_GOAL := ip_core
 
 # Package IP core
 ip_core:
