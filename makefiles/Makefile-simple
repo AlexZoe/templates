@@ -21,8 +21,6 @@ TARGET := <my_appl>
 
 # Compiler to use (change as required, e.g. g++)
 CC := gcc
-# Set general compiler flags (add include directories with '-I<path>')
-CFLAGS += -I.
 # Add general linker flags
 LDFLAGS +=
 # Set libraries for the linker with -l (e.g. pthread with '-lpthread')
@@ -40,19 +38,22 @@ else
 	CFLAGS += -O2
 endif
 
-# Directory containing source files (*.c, *.cpp, etc.)
+# Directories containing source files (*.c, *.cpp, etc.)
 SRC_DIR := .
-# Directory for header files (*.h, *.hpp, etc.)
+# Add source directories to search path
+VPATH := $(foreach DIR,$(SRC_DIR),$(DIR):)
+# Directories for header files (*.h, *.hpp, etc.)
 HEADER_DIR := .
+# Set general compiler flags (add include directories with '-I<path>')
+CFLAGS += -I. $(foreach DIR,$(HEADER_DIR),-I$(DIR))
 # Directory to place the object files in)
 BUILD_DIR := build
 
-# Add all source files found in the source directory (change file ending as
+# Add all source files found in the source directories (change file ending as
 # required). You may also list them explicitly if you want to.
-SRCS := $(wildcard $(SRC_DIR)/*.c)
+SRCS := $(wildcard $(foreach DIR, $(SRC_DIR), $(DIR)/*.c))
 # Add object file for each source file
-OBJS := $(SRCS:$(SRC_DIR)/%.c=$(BUILD_DIR)/%.o)
-
+OBJS = $(addprefix $(BUILD_DIR)/,$(notdir $(SRCS:%.c=%.o)))
 
 # Makefile targets
 .PHONY: all analyze clean
@@ -64,10 +65,10 @@ all: $(BUILD_DIR) $(TARGET)
 # Link object files to executable
 $(TARGET): $(OBJS)
 	@echo '    ' LD '    ' $@
-	@$(CC) $(LDFLAGS)-o $(TARGET) $^ $(LDLIBS)
+	@$(CC) $(LDFLAGS) -o $(TARGET) $^ $(LDLIBS)
 
 # Compile source files to object files
-$(BUILD_DIR)/%.o: $(SRC_DIR)/%.c
+$(BUILD_DIR)/%.o: %.c
 	@echo '    ' CC '    ' $@
 	@$(CC) $(CFLAGS) -c -o $@ $<
 
@@ -93,3 +94,4 @@ clean:
 	rm -rf $(BUILD_DIR)/*.o
 	rm -rf $(BUILD_DIR)/*.a
 	rm -rf $(BUILD_DIR)/*.so
+	rm -rf $(BUILD_DIR)
