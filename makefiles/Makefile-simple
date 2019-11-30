@@ -7,12 +7,12 @@
 #
 #  @brief	Makefile template for building Linux user space software.
 #
-#		Uses out of source compilation, i.e. files are built in a
-#		different directory then the source files.
-#               Call with 'make DEBUG=1' for debug flags and code coverage
-#               information.
-#               The output of the code coverage, 'index.html' in the build
-#               directory 'BUILD_DIR/html' can be viewed in a webbrower.
+#			Uses out of source compilation, i.e. files are built in a
+#			different directory then the source files.
+#			Call with 'make DEBUG=1' for debug flags and code coverage
+#			information.
+#			The output of the code coverage, 'index.html' in the build
+#			directory 'BUILD_DIR/html' can be viewed in a webbrower.
 #
 #-------------------------------------------------------------------------------
 
@@ -46,7 +46,7 @@ VPATH := $(foreach DIR,$(SRC_DIR),$(DIR):)
 HEADER_DIR := .
 # Set general compiler flags (add include directories with '-I<path>')
 CFLAGS += -I. $(foreach DIR,$(HEADER_DIR),-I$(DIR))
-# Directory to place the object files in)
+# Directory to place the object files in
 BUILD_DIR := build
 
 # Add all source files found in the source directories (change file ending as
@@ -84,7 +84,7 @@ analyze:
 	@lcov --capture --directory . --output-file $(BUILD_DIR)/$(TARGET).info
 	@genhtml $(BUILD_DIR)/$(TARGET).info --output-directory $(BUILD_DIR)/html
 
-# Remove all generated files
+# Remove all generated files (build directory might be same as source file one)
 clean:
 	rm -rf $(TARGET)
 	rm -rf $(TARGET)/html

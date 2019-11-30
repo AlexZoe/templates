@@ -14,7 +14,7 @@ PROJECT := <name>
 # Path to Vivado environment source script (located in the installation folder
 # and usually named settings64.sh)
 # Alternatively, source the environment before using the Makefile
-XLNX_TOOL_CHAIN := /opt/Xilinx-18-3/xilinx-vivado-2018_3-settings.sh
+XLNX_TOOL_CHAIN := /opt/Xilinx-18-3/Vivado/2018.3/settings64.sh
 SHELL := /bin/bash
 
 # Directory to be packed as IP core
