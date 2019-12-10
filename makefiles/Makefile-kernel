@@ -7,11 +7,11 @@
 #
 #  @brief	Makefile template for building Linux device driver modules.
 #
-#		Compile module for the architecture this Makefile is executed
-#		or for a different device by using the Xilinx cross-compile
-#		environment. Requires a Vivado installation and the Xilinx
-#		version of the Linux Kernel repository.
-#		Download with 'git clone git@github.com:Xilinx/linux-xlnx.git'
+#			Compile module for the architecture this Makefile is executed
+#			or for a different device by using the Xilinx cross-compile
+#			environment. Requires a Vivado installation and the Xilinx
+#			version of the Linux Kernel repository.
+#			Download with 'git clone git@github.com:Xilinx/linux-xlnx.git'
 #
 #-------------------------------------------------------------------------------
 
@@ -45,6 +45,7 @@ endif
 
 # Targets
 .PHONY := default clean
+.DEFAULT_GOAL := default
 
 # Call kernel Makefile and use 'Sparse' (e.g. checks if hardware addresses are
 # dereferenced directly). Remove C=1 if you do not want to use it.

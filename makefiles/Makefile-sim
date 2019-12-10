@@ -1,0 +1,65 @@
+#-------------------------------------------------------------------------------
+#
+#  @author	Alexander Zoellner
+#  @date	2019/08/31
+#  @mail	zoellner.contact<at>gmail.com
+#  @file	Makefile
+#
+#  brief	Makefile template for verification using verilator, google's unit
+#			tests and lcov for code coverage.
+#
+#			Hardware modules are converter from verilog to cpp or systemc for
+#			faster simulation.
+#
+#-------------------------------------------------------------------------------
+
+include depend.mk
+
+TARGET		:= testbench
+TOPLEVEL	:= fifo
+SHELL		:= /bin/bash
+SIM			:= verilator
+
+SIM_ROOT	?= $(shell '${SIM} -V | grep verilator | grep ROOT | awk '{print $3}'')
+HW_DIRS		:= hdl
+TB_DIR		:= tb
+UNIT_TESTS	:= unit_tests
+OBJ_DIR		:= obj_dir
+
+CXX			:= g++
+LDFLAGS		:= -pthread -fprofile-arcs
+GLIBS		:= /usr/local/lib/libgtest.a /usr/local/lib/libgtest_main.a
+CXXFLAGS	:= -std=c++11 -I../$(SW_STACK) -I../$(TB_DIR) -I../$(UNIT_TESTS) \
+			   -fprofile-arcs -ftest-coverage
+LDLIBS		:= -L$(OBJ_DIR) -lV$(TOPLEVEL)__ALL
+SIM_FLAGS	:= -Wall --MMD --trace -y $(HW_DIRS) -LDFLAGS "$(LDFLAGS)" \
+               -CFLAGS "$(CXXFLAGS)" -cc -exe
+
+VSRCS := $(wildcard $(foreach DIR, $(HW_DIRS), $(DIR)/*.v)) \
+		 $(wildcard $(foreach DIR, $(DEP_MODS), $(MOD_BASE)/$(DIR)/$(HW_DIRS)/*.v))
+TSRCS := $(wildcard $(TB_DIR)/*.cpp) $(wildcard $(UNIT_TESTS)/*.cpp)
+
+
+.PHONY: check clean $(TARGET) run wave coverage
+.DEFAULT_GOAL := run
+
+$(TARGET):
+	$(SIM) $(SIM_FLAGS) -exe $(TSRCS) $(GLIBS) $(VSRCS)
+	$(MAKE) -j`nproc` -C obj_dir -f V${TOPLEVEL}.mk
+
+check:
+	$(SIM) --lint-only $(SRCS)
+
+run: $(TARGET)
+	./$(OBJ_DIR)/V$(TOPLEVEL)
+
+coverage:
+	@lcov --capture --directory . --output-file $(OBJ_DIR)/$(TARGET).info
+	@genhtml $(OBJ_DIR)/$(TARGET).info --output-directory $(OBJ_DIR)/html
+
+wave:
+	gtkwave --save=save.gtkw *.vcd
+
+clean:
+	@rm -rf obj_dir *.log *.dmp *.vpd core *.vcd
+
