@@ -29,7 +29,7 @@ else
 
 # Cross-compile if Vivado environment has been set (the source script is usually
 # located in the installation directory)
-ifdef XILINX_VIVADO_DIR_
+ifdef XILINX_VIVADO
 # Cross-compile for ARM (set different architecture as required)
 export ARCH=arm
 # Set cross-compile prefix

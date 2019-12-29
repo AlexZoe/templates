@@ -23,7 +23,7 @@ SCRIPT_DIR := tcl
 BUILD_DIR := build
 
 # Check if a Vivado toolchain is already available, otherwise use default
-ifdef XILINX_VIVADO_DIR_
+ifdef XILINX_VIVADO
 ENV_CMD :=
 else
 ENV_CMD := source $(XLNX_TOOL_CHAIN) &&
