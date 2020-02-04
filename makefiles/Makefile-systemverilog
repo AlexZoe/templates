@@ -1,20 +1,22 @@
 #-------------------------------------------------------------------------------
 #
 #  @author	Alexander Zoellner
-#  @date	2019/07/21
+#  @date	2020/02/04
 #  @mail	zoellner.contact<at>gmail.com
-#  @file	Makefile-verilog
+#  @file	Makefile-systemverilog
 #
-#  brief	Makefile template for simulating a verilog-based hardware
+#  brief	Makefile template for simulating a sytemverilog-based hardware
 #			design using icarus verilog and gtkwave.
+#
+#			Adds verilog and systemverilog files to simulation source files.
 #
 #-------------------------------------------------------------------------------
 
 # Simulator to use (icarus verilog)
 SIM			:= iverilog
-# Flags for icarus verilog
+# Flags for icarus verilog (uses systemverilog 2012 standard)
 SIM_FLAGS	:= -gstrict-ca-eval -gio-range-error -Wall \
-			   -Wsensitivity-entire-vector
+		       -Wsensitivity-entire-vector -g2012 -Y .sv -Y .v
 
 # Main verilog file without file ending (or arbitrary name)
 PROJECT		:= <main-file>
@@ -28,9 +30,9 @@ BUILD_DIR	:= build
 SIM_FILE	:= wave.vcd
 
 # Add all verilog files for compilation
-SRCS		:= $(wildcard $(SRC_DIR)/*.v)
+SRCS		:= $(wildcard $(SRC_DIR)/*.sv) $(wildcard $(SRC_DIR)/*.v)
 # Add testbench
-TB			:= $(wildcard $(TB_DIR)/*_tb.v)
+TB			:= $(wildcard $(TB_DIR)/*_tb.sv)
 
 
 # Targets

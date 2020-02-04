@@ -17,18 +17,18 @@
 #-------------------------------------------------------------------------------
 
 # Name of the executable (change as required)
-TARGET := <my_appl>
+TARGET		:= <my_appl>
 
 # Compiler to use (change as required, e.g. g++)
-CC := gcc
+CC			:= gcc
 # Add general linker flags
-LDFLAGS +=
+LDFLAGS		+=
 # Set libraries for the linker with -l (e.g. pthread with '-lpthread')
-LDLIBS +=
+LDLIBS		+=
 # Code analysis compiler flags
-A_CFLAGS := -fprofile-arcs -ftest-coverage
+A_CFLAGS	:= -fprofile-arcs -ftest-coverage
 # Code analysis linker flags
-A_LDFLAGS := -fprofile-arcs
+A_LDFLAGS	:= -fprofile-arcs
 
 ifeq ($(DEBUG), 1)
 	LDLIBS += $(A_LDFLAGS)
@@ -39,21 +39,21 @@ else
 endif
 
 # Directories containing source files (*.c, *.cpp, etc.)
-SRC_DIR := .
+SRC_DIR		:= .
 # Add source directories to search path
-VPATH := $(foreach DIR,$(SRC_DIR),$(DIR):)
+VPATH		:= $(foreach DIR,$(SRC_DIR),$(DIR):)
 # Directories for header files (*.h, *.hpp, etc.)
-HEADER_DIR := .
+HEADER_DIR	:= .
 # Set general compiler flags (add include directories with '-I<path>')
-CFLAGS += -I. $(foreach DIR,$(HEADER_DIR),-I$(DIR))
+CFLAGS		+= -I. $(foreach DIR,$(HEADER_DIR),-I$(DIR))
 # Directory to place the object files in
-BUILD_DIR := build
+BUILD_DIR	:= build
 
 # Add all source files found in the source directories (change file ending as
 # required). You may also list them explicitly if you want to.
-SRCS := $(wildcard $(foreach DIR, $(SRC_DIR), $(DIR)/*.c))
+SRCS		:= $(wildcard $(foreach DIR, $(SRC_DIR), $(DIR)/*.c))
 # Add object file for each source file
-OBJS = $(addprefix $(BUILD_DIR)/,$(notdir $(SRCS:%.c=%.o)))
+OBJS		= $(addprefix $(BUILD_DIR)/,$(notdir $(SRCS:%.c=%.o)))
 
 # Makefile targets
 .PHONY: all analyze clean

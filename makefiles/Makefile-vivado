@@ -10,17 +10,17 @@
 #-------------------------------------------------------------------------------
 
 # Project name of the Vivado system (same as 'MODULE' name used in tcl)
-PROJECT := <name>
+PROJECT			:= <name>
 # Path to Vivado environment source script (located in the installation folder
 # and usually named settings64.sh)
 # Alternatively, source the environment before using the Makefile
-XLNX_TOOL_CHAIN := /opt/Xilinx-18-3/Vivado/2018.3/settings64.sh
-SHELL := /bin/bash
+XLNX_TOOL_CHAIN	:= /opt/Xilinx-18-3/Vivado/2018.3/settings64.sh
+SHELL			:= /bin/bash
 
 # Directory to be packed as IP core
-IP_CORE_DIR := hdl
-SCRIPT_DIR := tcl
-BUILD_DIR := build
+IP_CORE_DIR		:= hdl
+SCRIPT_DIR		:= tcl
+BUILD_DIR		:= build
 
 # Check if a Vivado toolchain is already available, otherwise use default
 ifdef XILINX_VIVADO

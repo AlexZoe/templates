@@ -21,9 +21,9 @@ PROJECT := <main-file>
 ifneq ($(KERNELRELEASE),)
 
 # The main object file derived from project name
-obj-m := $(PROJECT).o
+obj-m	:= $(PROJECT).o
 # Add further object files here if the module uses more than one source file
-objs :=
+objs	:=
 
 else
 
