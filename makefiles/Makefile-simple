@@ -19,6 +19,9 @@
 # Name of the executable (change as required)
 TARGET		:= <my_appl>
 
+# gcov, lcov and genhtml write their output to this file instead of stdout
+LOGFILE		:= coverage.log
+
 # Compiler to use (change as required, e.g. g++)
 CC			:= gcc
 # Add general linker flags
@@ -56,16 +59,16 @@ SRCS		:= $(wildcard $(foreach DIR, $(SRC_DIR), $(DIR)/*.c))
 OBJS		= $(addprefix $(BUILD_DIR)/,$(notdir $(SRCS:%.c=%.o)))
 
 # Makefile targets
-.PHONY: all analyze clean
+.PHONY: appl coverage clean
 # Default target
-.DEFAULT_GOAL := all
+.DEFAULT_GOAL := appl
 
-all: $(BUILD_DIR) $(TARGET)
+appl: $(BUILD_DIR) $(TARGET)
 
 # Link object files to executable
 $(TARGET): $(OBJS)
 	@echo '    ' LD '    ' $@
-	@$(CC) $(LDFLAGS) -o $(TARGET) $^ $(LDLIBS)
+	@$(CC) $(LDFLAGS) -o $(BUILD_DIR)/$@ $^ $(LDLIBS)
 
 # Compile source files to object files
 $(BUILD_DIR)/%.o: %.c
@@ -78,20 +81,28 @@ $(BUILD_DIR):
 
 # Analyze code coverage (has to be compiled with 'DEBUG=1' first and target
 # executed once)
-analyze:
+coverage:
 	@echo '    ' ANALYZE $(TARGET)
-	@gcov -b -u -f -o $(BUILD_DIR) $(SRCS)
-	@lcov --capture --directory . --output-file $(BUILD_DIR)/$(TARGET).info
-	@genhtml $(BUILD_DIR)/$(TARGET).info --output-directory $(BUILD_DIR)/html
+ifeq (,$(wildcard $(BUILD_DIR)/*.gcda))
+	@echo '    ' OUTPUT NOT FOUND
+	@echo '    ' Build with DEBUG=1 and execute \"$(TARGET)\"
+else
+	@gcov -b -u -f -o $(BUILD_DIR) $(SRCS) > $(BUILD_DIR)/$(LOGFILE)
+	@lcov -c -d $(BUILD_DIR) -o $(BUILD_DIR)/$(TARGET).info >> $(BUILD_DIR)/$(LOGFILE)
+	@genhtml -o $(BUILD_DIR)/html $(BUILD_DIR)/$(TARGET).info >> $(BUILD_DIR)/$(LOGFILE)
+	@echo '    ' OUTPUT written to $(BUILD_DIR)/html/index.html
+endif
 
 # Remove all generated files (build directory might be same as source file one)
 clean:
-	rm -rf $(TARGET)
-	rm -rf $(TARGET)/html
-	rm -rf $(BUILD_DIR)/*.gcda
-	rm -rf $(BUILD_DIR)/*.gcno
-	rm -rf $(BUILD_DIR)/*.info
-	rm -rf $(BUILD_DIR)/*.o
-	rm -rf $(BUILD_DIR)/*.a
-	rm -rf $(BUILD_DIR)/*.so
-	rm -rf $(BUILD_DIR)
+	@echo '    ' CLEAN $(BUILD_DIR)
+	@rm -rf $(BUILD_DIR)/$(TARGET)
+	@rm -rf $(BUILD_DIR)/$(LOGFILE)
+	@rm -rf $(TARGET)/html
+	@rm -rf $(BUILD_DIR)/*.gcda
+	@rm -rf $(BUILD_DIR)/*.gcno
+	@rm -rf $(BUILD_DIR)/*.info
+	@rm -rf $(BUILD_DIR)/*.o
+	@rm -rf $(BUILD_DIR)/*.a
+	@rm -rf $(BUILD_DIR)/*.so
+	@rm -rf $(BUILD_DIR)

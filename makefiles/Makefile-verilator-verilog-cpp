@@ -8,11 +8,12 @@
 #  brief	Makefile template for verification using verilator, google's unit
 #			tests and lcov for code coverage.
 #
-#			Hardware modules are converter from verilog to cpp or systemc for
+#			Hardware modules are converted from verilog to cpp or systemc for
 #			faster simulation.
 #
 #-------------------------------------------------------------------------------
 
+# Contains other hardware and software this module depends on
 include depend.mk
 
 TARGET		:= testbench
@@ -20,46 +21,62 @@ TOPLEVEL	:= fifo
 SHELL		:= /bin/bash
 SIM			:= verilator
 
+# Look for verilator source directory
 SIM_ROOT	?= $(shell '${SIM} -V | grep verilator | grep ROOT | awk '{print $3}'')
 HW_DIRS		:= hdl
 TB_DIR		:= tb
 UNIT_TESTS	:= unit_tests
-OBJ_DIR		:= obj_dir
+# Make sure to use a build folder since verilator creates *a lot* of files
+BUILD_DIR	:= build
 
 CXX			:= g++
 LDFLAGS		:= -pthread -fprofile-arcs
+# googletest for unit tests
 GLIBS		:= /usr/local/lib/libgtest.a /usr/local/lib/libgtest_main.a
 CXXFLAGS	:= -std=c++11 -I../$(SW_STACK) -I../$(TB_DIR) -I../$(UNIT_TESTS) \
 			   -fprofile-arcs -ftest-coverage
-LDLIBS		:= -L$(OBJ_DIR) -lV$(TOPLEVEL)__ALL
+LDLIBS		:= -L$(BUILD_DIR) -lV$(TOPLEVEL)__ALL
 SIM_FLAGS	:= -Wall --MMD --trace -y $(HW_DIRS) -LDFLAGS "$(LDFLAGS)" \
                -CFLAGS "$(CXXFLAGS)" -cc -exe
 
+# Hardware source files (scans dependencies recursively)
 VSRCS := $(wildcard $(foreach DIR, $(HW_DIRS), $(DIR)/*.v)) \
 		 $(wildcard $(foreach DIR, $(DEP_MODS), $(MOD_BASE)/$(DIR)/$(HW_DIRS)/*.v))
+# Unit tests and testbench
 TSRCS := $(wildcard $(TB_DIR)/*.cpp) $(wildcard $(UNIT_TESTS)/*.cpp)
 
 
 .PHONY: check clean $(TARGET) run wave coverage
 .DEFAULT_GOAL := run
 
+# Let verilator translate hdl files and build libraries
 $(TARGET):
-	$(SIM) $(SIM_FLAGS) -exe $(TSRCS) $(GLIBS) $(VSRCS)
-	$(MAKE) -j`nproc` -C obj_dir -f V${TOPLEVEL}.mk
+	@echo '    ' Build $@
+	@$(SIM) --Mdir $(BUILD_DIR) -exe $(SIM_FLAGS) $(TSRCS) $(GLIBS) $(VSRCS)
+	@$(MAKE) -j`nproc` -C $(BUILD_DIR) -f V${TOPLEVEL}.mk
 
+# Only check syntax and quit
 check:
-	$(SIM) --lint-only $(SRCS)
+	@$(SIM) --lint-only $(SRCS)
 
+# Call testbench from build folder so it does not have to specify the path
 run: $(TARGET)
-	./$(OBJ_DIR)/V$(TOPLEVEL)
+	@cd $(BUILD_DIR) && ./V$(TOPLEVEL)
 
 coverage:
-	@lcov --capture --directory . --output-file $(OBJ_DIR)/$(TARGET).info
-	@genhtml $(OBJ_DIR)/$(TARGET).info --output-directory $(OBJ_DIR)/html
+	@echo '    ' ANALYZE $(TARGET)
+ifeq (,$(wildcard $(BUILD_DIR)/*.gcda))
+	@echo '    ' OUTPUT NOT FOUND
+	@echo '    ' Build with DEBUG=1 and execute \"$(TARGET)\"
+else
+	@lcov -c -d $(BUILD_DIR) -o $(BUILD_DIR)/$(TARGET).info > $(BUILD_DIR)/$(LOGFILE)
+	@genhtml -o $(BUILD_DIR)/html $(BUILD_DIR)/$(TARGET).info >> $(BUILD_DIR)/$(LOGFILE)
+	@echo '    ' OUTPUT written to $(BUILD_DIR)/html/index.html
+endif
 
 wave:
-	gtkwave --save=save.gtkw *.vcd
+	@gtkwave --save=save.gtkw *.vcd
 
 clean:
-	@rm -rf obj_dir *.log *.dmp *.vpd core *.vcd
-
+	@echo '    ' CLEAN $(BUILD_DIR)
+	@rm -rf $(BUILD_DIR)

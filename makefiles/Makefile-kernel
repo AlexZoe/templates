@@ -50,18 +50,20 @@ endif
 # Call kernel Makefile and use 'Sparse' (e.g. checks if hardware addresses are
 # dereferenced directly). Remove C=1 if you do not want to use it.
 default:
-	$(MAKE) -C $(KDIR) M=$$PWD C=1
+	@$(MAKE) -C $(KDIR) M=$$PWD C=1
 
 # Remove all generated files
 clean:
-	rm -rf *.order
-	rm -rf *.symvers
-	rm -rf *.o
-	rm -rf *.ko
-	rm -rf *.mod.*
-	rm -rf .$(PROJECT)*
-	rm -rf .tmp*
-	rm -rf .built-in*
+	@echo '    '
+	@rm -rf *.order
+	@rm -rf *.symvers
+	@rm -rf *.o
+	@rm -rf *.ko
+	@rm -rf *.mod.*
+	@rm -rf .$(PROJECT)*
+	@rm -rf .tmp*
+	@rm -rf .built-in*
+	@rm -rf .cache.mk
 
 endif
 
