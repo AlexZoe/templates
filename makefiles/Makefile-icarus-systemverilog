@@ -12,44 +12,50 @@
 #
 #-------------------------------------------------------------------------------
 
+DEP_MK_PATH := ..
+include $(DEP_MK_PATH)/depend.mk
+
+TARGET		:= testbench
 # Main verilog file without file ending and testbench topmodule
-PROJECT		:= <main-file>
+TOPLEVEL	:= example_module
+# Simulator to use (icarus verilog)
+SIM		:= iverilog
 
 # Testbench writes output to this file instead of stdout
 LOGFILE		:= simulation.log
 
-# Directory containing verilog source files
-SRC_DIR		:= hdl
 # Directory containing testbench
-TB_DIR		:= tb
+TB_DIR		:= ../hdl
 # Directory to generate files in
 BUILD_DIR	:= build
 
 # Add all verilog files for compilation
-SRCS		:= $(wildcard $(SRC_DIR)/*.sv) $(wildcard $(SRC_DIR)/*.v)
-# Add testbench (Only allowed to contain a single testbench file)
-TB			:= $(wildcard $(TB_DIR)/*_tb.sv)
+SRCS := $(wildcard $(foreach DIR, $(HW_DIRS), \
+			$(DEP_MK_PATH)/$(MOD_BASE)/$(CUR_MODULE)/$(DIR)/*.*v)) \
+		$(wildcard $(foreach DIR, $(DEP_MODULES),	\
+			$(DEP_MK_PATH)/$(MOD_BASE)/$(DIR)/$(HW_DIRS)/*.*v))
 
-# Simulator to use (icarus verilog)
-SIM			:= iverilog
+# Add testbench (Only allowed to contain a single testbench file)
+TB			:= $(wildcard $(TB_DIR)/*.*v)
+
 # Flags for icarus verilog (uses systemverilog 2012 standard)
 SIM_FLAGS	:= -gstrict-ca-eval -gio-range-error -Wall \
 		       -Wsensitivity-entire-vector -g2012 -Y .sv -Y .v
 
 # Targets
-.PHONY: clean sim build build_dir wave
+.PHONY: clean run $(TARGET) build_dir wave
 # Default when calling 'make'
-.DEFAULT_GOAL := build
+.DEFAULT_GOAL := $(TARGET)
 
 # Build testbench executable
-build: build_dir
-	@echo '    ' BUILD $(PROJECT)
-	@$(SIM) $(SIM_FLAGS) -o $(BUILD_DIR)/$(PROJECT)_tb -s $(PROJECT)_tb $(TB) $(SRCS)
+(TARGET): build_dir
+	@echo '    ' BUILD $@
+	@$(SIM) $(SIM_FLAGS) -o $(BUILD_DIR)/$@ -s $(TOPLEVEL)_tb $(TB) $(SRCS)
 
 # Execute testbench and generate GtKWave input file
-sim: build
-	@echo '    ' SIMULATE $(PROJECT)
-	@cd $(BUILD_DIR) && vvp $(PROJECT)_tb > $(LOGFILE)
+run: $(TARGET)
+	@echo '    ' RUN $(TARGET)
+	@cd $(BUILD_DIR) && vvp $(TARGET) > $(LOGFILE)
 
 # Start GTKWave with save file (requires manually running 'make sim' first)
 wave:
@@ -62,10 +68,4 @@ build_dir:
 # Remove all generated files
 clean:
 	@echo '    ' CLEAN $(BUILD_DIR)
-	@rm -rf $(BUILD_DIR)/$(PROJECT)_tb
-	@rm -rf $(BUILD_DIR)/*.vcd
-	@rm -rf $(BUILD_DIR)/*.vvp
-	@rm -rf $(BUILD_DIR)/*.fst
-	@rm -rf $(BUILD_DIR)/*.log
-	@rm -rf $(BUILD_DIR)/*.wave
 	@rm -rf $(BUILD_DIR)

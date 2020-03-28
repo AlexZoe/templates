@@ -13,37 +13,42 @@
 #
 #-------------------------------------------------------------------------------
 
-# Contains other hardware and software this module depends on
-include depend.mk
+DEP_MK_PATH := ..
+# Contains other paths to other hardware and software this module depends on
+include $(DEP_MK_PATH)/depend.mk
 
 TARGET		:= testbench
-TOPLEVEL	:= fifo
-SHELL		:= /bin/bash
+TOPLEVEL	:= example_module
 SIM			:= verilator
 
-# Look for verilator source directory
-SIM_ROOT	?= $(shell '${SIM} -V | grep verilator | grep ROOT | awk '{print $3}'')
-HW_DIRS		:= hdl
-TB_DIR		:= tb
+SIM_ROOT	?= $(shell '${SIM} -V | grep ROOT | grep -o "[a-z\/]\+$(SIM)"')
+TB_DIR		:= cpp
 UNIT_TESTS	:= unit_tests
 # Make sure to use a build folder since verilator creates *a lot* of files
 BUILD_DIR	:= build
+# gcov, lcov and genhtml write their output to this file instead of stdout
+LOGFILE		:= coverage.log
 
 CXX			:= g++
 LDFLAGS		:= -pthread -fprofile-arcs
 # googletest for unit tests
 GLIBS		:= /usr/local/lib/libgtest.a /usr/local/lib/libgtest_main.a
-CXXFLAGS	:= -std=c++11 -I../$(SW_STACK) -I../$(TB_DIR) -I../$(UNIT_TESTS) \
+# Include paths are relative from build directory
+CXXFLAGS	:= -std=c++11 -I../$(DEP_MK_PATH)/$(VERIFICATION) \
+			   -I../$(TB_DIR) \
+			   -I../$(UNIT_TESTS) \
 			   -fprofile-arcs -ftest-coverage
-LDLIBS		:= -L$(BUILD_DIR) -lV$(TOPLEVEL)__ALL
-SIM_FLAGS	:= -Wall --MMD --trace -y $(HW_DIRS) -LDFLAGS "$(LDFLAGS)" \
-               -CFLAGS "$(CXXFLAGS)" -cc -exe
+SIM_FLAGS	:= -Wall --MMD --trace -LDFLAGS "$(LDFLAGS)" \
+			   -CFLAGS "$(CXXFLAGS)" -cc -exe --language 1800-2017
 
 # Hardware source files (scans dependencies recursively)
-VSRCS := $(wildcard $(foreach DIR, $(HW_DIRS), $(DIR)/*.v)) \
-		 $(wildcard $(foreach DIR, $(DEP_MODS), $(MOD_BASE)/$(DIR)/$(HW_DIRS)/*.v))
+VSRCS := $(wildcard $(foreach DIR, $(HW_DIRS), \
+			$(DEP_MK_PATH)/$(MOD_BASE)/$(CUR_MODULE)/$(DIR)/*.sv)) \
+		 $(wildcard $(foreach DIR, $(DEP_MODULES),	\
+			../$(MOD_BASE)/$(DIR)/$(HW_DIRS)/*.sv))
 # Unit tests and testbench
-TSRCS := $(wildcard $(TB_DIR)/*.cpp) $(wildcard $(UNIT_TESTS)/*.cpp)
+TSRCS := $(wildcard $(TB_DIR)/*.cpp) $(wildcard $(UNIT_TESTS)/*.cpp) \
+		 $(wildcard $(DEP_MK_PATH)/$(VERIFICATION)/*.cpp)
 
 
 .PHONY: check clean $(TARGET) run wave coverage
@@ -51,16 +56,17 @@ TSRCS := $(wildcard $(TB_DIR)/*.cpp) $(wildcard $(UNIT_TESTS)/*.cpp)
 
 # Let verilator translate hdl files and build libraries
 $(TARGET):
-	@echo '    ' Build $@
-	@$(SIM) --Mdir $(BUILD_DIR) -exe $(SIM_FLAGS) $(TSRCS) $(GLIBS) $(VSRCS)
+	@echo '    ' BUILD $@
+	@$(SIM) -exe --Mdir $(BUILD_DIR) $(SIM_FLAGS) $(TSRCS) $(GLIBS) $(VSRCS)
 	@$(MAKE) -j`nproc` -C $(BUILD_DIR) -f V${TOPLEVEL}.mk
 
 # Only check syntax and quit
 check:
-	@$(SIM) --lint-only $(SRCS)
+	@$(SIM) --lint-only $(VSRCS)
 
 # Call testbench from build folder so it does not have to specify the path
 run: $(TARGET)
+	@echo '    ' RUN $(TARGET)
 	@cd $(BUILD_DIR) && ./V$(TOPLEVEL)
 
 coverage:
@@ -75,7 +81,7 @@ else
 endif
 
 wave:
-	@gtkwave --save=save.gtkw *.vcd
+	@gtkwave --save=save.gtkw $(BUILD_DIR)/*.vcd
 
 clean:
 	@echo '    ' CLEAN $(BUILD_DIR)
