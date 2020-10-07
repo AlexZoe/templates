@@ -1,0 +1,79 @@
+\usepackage{listings}
+\usepackage{color}
+
+\definecolor{purple}{rgb}{0.502,0,0.502}
+\definecolor{amethyst}{rgb}{0.6,0.4,0.8}
+\definecolor{blue}{rgb}{0,0,0.8}
+\definecolor{black}{rgb}{1,1,1}
+\definecolor{lightgray}{gray}{0.3}
+\definecolor{gray}{gray}{0.6}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+% Rename default 'Listing' to 'Code'
+\renewcommand{\lstlistingname}{Code}
+
+\lstdefinestyle{vhdl_lst}	{
+    language=vhdl,
+    backgroundcolor=\color{backcolour},
+    commentstyle=\color{lightgray},
+    keywordstyle=\color{purple},
+    numberstyle=\tiny\color{gray},
+    stringstyle=\color{blue},
+    basicstyle=\footnotesize,
+    breakatwhitespace=false,
+    xleftmargin=\parindent,
+    frame=L,
+    breaklines=true,
+    captionpos=b,
+    keepspaces=true,
+    numbers=left,
+    numbersep=10pt,
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    tabsize=2
+}
+
+\lstdefinestyle{sh_lst}	{
+    language=sh,
+    backgroundcolor=\color{backcolour},
+    commentstyle=\color{lightgray},
+    keywordstyle=\color{amethyst},
+    numberstyle=\small\color{gray},
+    stringstyle=\color{blue},
+    basicstyle=\footnotesize,
+    breakatwhitespace=false,
+    xleftmargin=\parindent,
+    frame=L,
+    breaklines=true,
+    captionpos=b,
+    keepspaces=true,
+    numbers=left,
+    numbersep=10pt,
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    tabsize=2
+}
+
+\lstdefinestyle{c_lst}	{
+    language=c,
+    backgroundcolor=\color{backcolour},
+    commentstyle=\color{lightgray},
+    keywordstyle=\color{amethyst},
+    numberstyle=\small\color{gray},
+    stringstyle=\color{blue},
+    basicstyle=\footnotesize,
+    breakatwhitespace=false,
+    xleftmargin=\parindent,
+    frame=L,
+    breaklines=true,
+    captionpos=b,
+    keepspaces=true,
+    numbers=left,
+    numbersep=10pt,
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    tabsize=2
+}
